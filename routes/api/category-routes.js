@@ -51,12 +51,13 @@ router.put('/:id', (req, res) => {
     // update a category by its `id` value
     Category.update({
             category_name: req.body.category_name
-        })
-        .where({
-            id: req.body.id
+        }, {
+            where: {
+                id: req.params.id
+            }
         })
         .then(dbData => {
-            if (!dbData[0]) {
+            if (!dbData) {
                 res.status(404).json({ message: 'Category not found' });
                 return;
             }
@@ -76,7 +77,7 @@ router.delete('/:id', (req, res) => {
             }
         })
         .then(dbData => {
-            if (!dbData[0]) {
+            if (!dbData) {
                 res.status(404).json({ message: 'Category not found' });
                 return;
             }
