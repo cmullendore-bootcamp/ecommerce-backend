@@ -27,6 +27,12 @@ router.get('/:id', (req, res) => {
     // find a single product by its `id`
     // be sure to include its associated Category and Tag data
     Product.findOne({
+            include: [{
+                model: Category
+            }, {
+                model: Tag,
+                as: "tags"
+            }],
             where: {
                 id: req.params.id
             }
@@ -46,15 +52,12 @@ router.get('/:id', (req, res) => {
 
 // create new product
 router.post('/', (req, res) => {
-    /* req.body should look like this...
-      {
-        product_name: "Basketball",
-        price: 200.00,
-        stock: 3,
-        tagIds: [1, 2, 3, 4]
-      }
-    */
-    Product.create(req.body)
+    Product.create({
+            product_name: req.body.product_name,
+            price: req.body.price,
+            stock: req.body.stock,
+            category_id: req.body.category_id
+        })
         .then((product) => {
             // if there's product tags, we need to create pairings to bulk create in the ProductTag model
             if (req.body.tagIds && req.body.tagIds.length) {
@@ -64,12 +67,29 @@ router.post('/', (req, res) => {
                         tag_id,
                     };
                 });
-                return ProductTag.bulkCreate(productTagIdArr);
+
+                ProductTag.bulkCreate(productTagIdArr)
+                    .then(() => {
+                        return product;
+                    });
             }
-            // if no product tags, just respond
-            res.status(200).json(product);
+
+            return product;
         })
-        .then((productTagIds) => res.status(200).json(productTagIds))
+        .then(product => {
+            return Product.findOne({
+                include: [{
+                    model: Category
+                }, {
+                    model: Tag,
+                    as: "tags"
+                }],
+                where: {
+                    id: product.id
+                }
+            });
+        })
+        .then(data => res.json(data))
         .catch((err) => {
             console.log(err);
             res.status(400).json(err);
