@@ -19,7 +19,8 @@ async function Start(rebuild, reseed) {
         .then(console.log("Database synchronized"));
 
     if (reseed) {
-        await seeds();
+        await seeds()
+            .then(console.log("Database seeded"));
     }
 
     app.listen(PORT, () => {
@@ -27,7 +28,19 @@ async function Start(rebuild, reseed) {
     });
 }
 
-const recreateDb = process.argv.indexOf("--rebuild") < 0 ? false : true;
-const reseedDb = process.argv.indexOf("--seed") < 0 ? false : true;
+async function SeedDb() {
+    console.log("Reseeding database");
+    await seeds();
+    console.log("Database seeded");
+    process.exit(0);
+}
 
-Start(recreateDb, reseedDb);
+if (process.argv.indexOf("--reseed") > 0) {
+    SeedDb();
+} else {
+    console.log("Starting app");
+    const recreateDb = process.argv.indexOf("--rebuild") < 0 ? false : true;
+    const reseedDb = process.argv.indexOf("--seed") < 0 ? false : true;
+
+    Start(recreateDb, reseedDb);
+}

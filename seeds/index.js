@@ -4,7 +4,6 @@ const seedTags = require('./tag-seeds');
 const seedProductTags = require('./product-tag-seeds');
 
 const sequelize = require('../config/connection');
-//const { Model } = require('sequelize/types');
 
 const seedAll = async() => {
 
@@ -19,8 +18,6 @@ const seedAll = async() => {
 
     await seedProductTags();
     console.log('\n----- PRODUCT TAGS SEEDED -----\n');
-
-    process.exit(0);
 };
 
 const seed = () => seedAll();;
