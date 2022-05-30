@@ -102,7 +102,7 @@ router.put('/:id', (req, res) => {
     Product.update(req.body, {
             where: {
                 id: req.params.id,
-            },
+            }
         })
         .then((product) => {
             // find all associated tags from ProductTag
@@ -146,7 +146,7 @@ router.delete('/:id', (req, res) => {
             }
         })
         .then(dbData => {
-            if (!dbData[0]) {
+            if (!dbData) {
                 res.status(404).json({ message: 'Product not found' });
                 return;
             }
